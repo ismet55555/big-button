@@ -1,0 +1,38 @@
+# Reference: https://doc.rust-lang.org/cargo/reference/config.html
+
+##############################################################################
+##############################################################################
+# Build and Compiler Settings
+# Reference: https://doc.rust-lang.org/cargo/reference/config.html#build
+[build]
+target = "thumbv6m-none-eabi" # Chip: Cortex-M0 and Cortex-M0+ (RP2040)
+rustc = "rustc"               # Rust Compiler
+rustdoc = "rustdoc"           # Rust Documentation Generator
+jobs = 1                      # Number of parallel jobs to run
+
+##############################################################################
+##############################################################################
+# Run Specification for Spcific Target Platform
+# Reference: https://doc.rust-lang.org/cargo/reference/config.html#target
+[target.thumbv6m-none-eabi]
+runner = [
+  "probe-rs",
+  "run",
+  "--chip=RP2040",
+  "--log-format",
+  "{[{L}]%dimmed%bold} {{f:dimmed}:{l:dimmed}%30}: {s}",
+]
+# Custom flags for compiler for this target
+rustflags = [
+  "-C",
+  "link-args=-Tlink.x -Tlink-rp.x -Tdefmt.x",
+  "-C",
+  "no-vectorize-loops",
+]
+
+##############################################################################
+# Environmental Variables
+# Reference: https://doc.rust-lang.org/cargo/reference/config.html#env
+[env]
+# Logger Formatting: https://defmt.ferrous-systems.com/custom-log-output
+DEFMT_LOG = { value = "debug", force = true }

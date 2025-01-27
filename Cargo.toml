@@ -1,6 +1,60 @@
+########################################################################################
+# This Project/Package Metadata - UPDATE ME!
+# Reference: https://doc.rust-lang.org/cargo/reference/workspaces.html#the-package-table
 [package]
+authors = ["Your Own Name"]
+edition = "2021"            # Rust code edition: https://doc.rust-lang.org/edition-guide/rust-2021/index.html
+license = "MIT"
 name = "big-button"
-version = "0.1.0"
-edition = "2021"
+version = "0.1.0"           # This project version
+readme = "README.md"
 
+########################################################################################
+# Rust program dependencies
+# Reference: https://doc.rust-lang.org/cargo/guide/dependencies.html
 [dependencies]
+cortex-m = "0.7"    # Core support for ARM Cortex-M microcontrollers
+cortex-m-rt = "0.7" # Startup code and minimal runtime for Cortex-M
+panic-halt = "1.0"  # Basic panic handler that halts on panic
+defmt = "0.3"       # Deferred formatting for embedded logging
+defmt-rtt = "0.4"   # RTT (Real-Time Transfer) transport for defmt
+
+# Debug probe panic handler with defmt support
+panic-probe = { version = "0.3", features = ["print-defmt"] }
+
+# Embassy rust embedded framework dependencies
+embassy-executor = { git = "https://github.com/embassy-rs/embassy.git", branch = "main", features = [
+  "arch-cortex-m",
+  "executor-thread",
+  "executor-interrupt",
+  "defmt",
+  "task-arena-size-98304",
+] }
+embassy-rp = { git = "https://github.com/embassy-rs/embassy.git", branch = "main", features = [
+  "defmt",
+  "unstable-pac",
+  "time-driver",
+  "critical-section-impl",
+  "rp2040",
+] }
+embassy-time = { git = "https://github.com/embassy-rs/embassy.git", branch = "main", features = [
+  "defmt",
+  "defmt-timestamp-uptime",
+] }
+embassy-sync = { git = "https://github.com/embassy-rs/embassy.git", branch = "main", features = [
+  "defmt",
+] }
+
+########################################################################################
+# Compiler profile for when running cargo run --releas
+# Reference: https://doc.rust-lang.org/cargo/reference/profiles.html
+[profile.release]
+codegen-units = 1        # Number of codegen units - 1
+debug = 2                # Debug info included in compiled binary - 0: none, 1: line numbers, 2: full
+debug-assertions = false # Debug assertion - disabled
+incremental = false      # Incremental compilation - disabled
+lto = 'fat'              # Link-time optimization - fat: Perform optimization across all crates
+opt-level = "s"          # Optimize compile - s: optimize for binary size
+overflow-checks = true   # Integer overflow checks - disabled
+panic = "abort"          # Panic strategy - abort: terminate process upon panic
+rpath = false            # Relative path - disabled
