@@ -28,7 +28,6 @@ embassy-executor = { git = "https://github.com/embassy-rs/embassy.git", branch =
   "executor-thread",
   "executor-interrupt",
   "defmt",
-  "task-arena-size-98304",
 ] }
 embassy-rp = { git = "https://github.com/embassy-rs/embassy.git", branch = "main", features = [
   "defmt",
