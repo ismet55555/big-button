@@ -6,6 +6,6 @@ channel = "nightly"
 # Lists the Rust components to include in the toolchain
 components = ["rust-src", "rust-std", "rustc-dev", "cargo", "rustfmt", "clippy"]
 
-# Defines the cross-compilation target for bare-metal ARM Cortex-M0 devices
+# Defines the cross-compilation target for bare-metal ARM Cortex-M33 (ARMv8-M) devices
 # Format: <ARCHITECTURE>-<PLATFORM_VENDOR>-<OPERATING_SYSTEM>-<APP_BINARY_INTERFACE>
-targets = ["thumbv6m-none-eabi"]
+targets = ["thumbv8m.main-none-eabihf"] # "hf" indicates floating-point support

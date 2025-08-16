@@ -15,7 +15,7 @@ fn main() {
         .unwrap();
     println!("cargo:rustc-link-search={}", out.display());
 
-    // Re-run on any changes `memory.x` and `build.rs`
+    // Re-run for any changes to `memory.x` and `build.rs`
     println!("cargo:rerun-if-changed=build.rs");
     println!("cargo:rerun-if-changed=memory.x");
 }
