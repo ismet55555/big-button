@@ -1,21 +1,17 @@
 # Reference: https://doc.rust-lang.org/cargo/reference/config.html
 
 ##############################################################################
-##############################################################################
 # Build and Compiler Settings
 # Reference: https://doc.rust-lang.org/cargo/reference/config.html#build
 [build]
-# target = "thumbv6m-none-eabi" # Chip: Cortex-M0 and Cortex-M0+ (RP2040)
 target = "thumbv8m.main-none-eabihf" # Chip: Cortex-M33 (ARMv8-M) (RP2350)
 rustc = "rustc"                      # Rust Compiler
 rustdoc = "rustdoc"                  # Rust Documentation Generator
 jobs = 1                             # Number of parallel jobs to run
 
 ##############################################################################
-##############################################################################
 # Run Specification for Spcific Target Platform
 # Reference: https://doc.rust-lang.org/cargo/reference/config.html#target
-# [target.thumbv6m-none-eabi]
 [target.thumbv8m.main-none-eabihf]
 runner = [
   "probe-rs",

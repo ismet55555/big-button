@@ -1,7 +1,7 @@
 #![no_std]
 #![no_main]
-#![allow(unused_variables)] // for development
-#![allow(unused_imports)] // for development
+#![allow(unused_variables)] // only used for development
+#![allow(unused_imports)] // only used for development
 
 use defmt::*;
 use defmt_rtt as _;

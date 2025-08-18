@@ -45,7 +45,6 @@ embassy-time = { version = "0.4", features = [
 embassy-sync = { version = "0.7", features = ["defmt"] }
 embassy-futures = { version = "0.1", features = ["defmt"] }
 
-
 ########################################################################################
 # Compiler profile for when running cargo run --releas
 # Reference: https://doc.rust-lang.org/cargo/reference/profiles.html
