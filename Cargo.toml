@@ -46,7 +46,14 @@ embassy-sync = { version = "0.7", features = ["defmt"] }
 embassy-futures = { version = "0.1", features = ["defmt"] }
 
 ########################################################################################
-# Compiler profile for when running cargo run --releas
+# Dependencies required during build process (ie. build.rs)
+# Reference: https://doc.rust-lang.org/cargo/reference/specifying-dependencies.html#build-dependencies
+[build-dependencies]
+serde = "1.0"
+serde_json = "1.0"
+
+########################################################################################
+# Compiler profile for when running cargo run --release
 # Reference: https://doc.rust-lang.org/cargo/reference/profiles.html
 [profile.release]
 codegen-units = 1        # Number of codegen units - 1
