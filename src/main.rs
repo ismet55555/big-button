@@ -12,10 +12,17 @@ use embassy_rp::config::Config;
 use embassy_rp::gpio;
 use embassy_time::Timer;
 
+mod utility;
+
 // Loading configurations
 // Note: This comes from the 'configs.rs' file created in 'build.rs' from 'configs.json'
 // Note: All loaded configurations will be UPPERCASE string slice (&str) constants
 include!(concat!(env!("OUT_DIR"), "/configs.rs"));
+
+// Loading obfuscated secrets (XOR_KEY and _OBFUSCATED constants)
+// Note: Similar considerations as configurations
+// Note: Load via utility.deobfuscate()
+include!(concat!(env!("OUT_DIR"), "/secrets.rs"));
 
 #[embassy_executor::main]
 async fn main(spawner: Spawner) {
@@ -32,6 +39,12 @@ async fn main(spawner: Spawner) {
         info!("Hello there - {}", index);
         Timer::after_secs(1).await;
     }
+
+    // Deobfuscate secret (The utility module accesses XOR_KEY)
+    let super_secret_info = utility::deobfuscate(SUPER_SECRET_INFO_OBFUSCATED);
+
+    // WARNING: Never log secrets! This is for demonstration only
+    info!("Super Secret Info: {}", super_secret_info.as_str());
 
     // Start an infinite loop
     loop {

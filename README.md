@@ -17,3 +17,17 @@ Currently the following configurations are supported:
 {
   "number_of_messages": "5"
 }
+```
+
+## Secrets
+
+Create and fill in a `secrets.json` file that contains sensitive
+secret constants used by this project to run correctly.
+
+Currently the following secrets are needed:
+
+```json
+{
+  "super_secret_info": "Area51HasNoAliens"
+}
+```

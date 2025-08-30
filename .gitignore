@@ -30,3 +30,6 @@ Thumbs.db
 .project
 Session.vim
 .Session.vim
+
+# Any secrets files
+**/*secret*
