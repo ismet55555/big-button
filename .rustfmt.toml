@@ -1,0 +1,4 @@
+# Rust Formatter Configurations
+
+max_width = 120
+trailing_comma = "Vertical"

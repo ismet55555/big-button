@@ -8,7 +8,7 @@ use defmt_rtt as _;
 use panic_probe as _;
 
 use embassy_executor::Spawner;
-use embassy_rp::config::Config;
+use embassy_rp::config::Config as HalConfig;
 use embassy_rp::gpio;
 use embassy_time::Timer;
 
@@ -26,27 +26,28 @@ include!(concat!(env!("OUT_DIR"), "/secrets.rs"));
 
 #[embassy_executor::main]
 async fn main(spawner: Spawner) {
-    // Initialize system with proper clock configuration
-    let config = Config::default();
-    let _peripherals = embassy_rp::init(config);
+    info!("==================================");
+    info!("    Package: {} v{}", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
+    info!("==================================");
 
-    // Parse and define a configuration value
-    let number_of_messages = NUMBER_OF_MESSAGES.parse::<u8>().unwrap();
+    info!("Setting system clock frequency ...");
+    let mut hal_configuration = HalConfig::default();
+    utility::set_system_clock_frequency(
+        &mut hal_configuration,
+        12_000_000,
+        SYSTEM_CLOCK_FREQEUENCY_MHZ.parse::<u32>().unwrap(),
+        USB_CLOCK_FREQEUENCY_MHZ.parse::<u32>().unwrap(),
+    );
+    let peripherals = embassy_rp::init(hal_configuration);
 
-    info!("Number of Messages: {}", number_of_messages);
+    // Log and verify system clock frequencies
+    utility::print_device_frequencies();
+    utility::verify_clock_with_timer(500).await;
 
-    for index in 1..=number_of_messages {
-        info!("Hello there - {}", index);
-        Timer::after_secs(1).await;
-    }
+    info!("All Set! Running async loop ...");
 
-    // Deobfuscate secret (The utility module accesses XOR_KEY)
-    let super_secret_info = utility::deobfuscate(SUPER_SECRET_INFO_OBFUSCATED);
-
-    // WARNING: Never log secrets! This is for demonstration only
-    info!("Super Secret Info: {}", super_secret_info.as_str());
-
-    // Start an infinite loop
+    // General async loop to ensure entire program runs forever while
+    // asynchronously working on other tasks
     loop {
         Timer::after_secs(5).await;
     }
