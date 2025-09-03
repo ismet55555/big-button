@@ -28,14 +28,12 @@ fn main() {
     println!("cargo:rerun-if-changed=secrets.json");
 
     // Load configurations from local 'configs.json' file
-    let configs_keys = ["number_of_messages"];
-    load_configs(out_dir.to_str().unwrap(), configs_keys)
-        .unwrap_or_else(|error| panic!("[ERROR] {error:?}"));
+    let configs_keys = ["system_clock_freqeuency_mhz", "usb_clock_freqeuency_mhz"];
+    load_configs(out_dir.to_str().unwrap(), configs_keys).unwrap_or_else(|error| panic!("[ERROR] {error:?}"));
 
     // Load secrets from local 'secrets.json' file with XOR obfuscation
     let secrets_keys = ["super_secret_info"];
-    load_secrets(out_dir.to_str().unwrap(), secrets_keys)
-        .unwrap_or_else(|error| panic!("[ERROR] {error:?}"));
+    load_secrets(out_dir.to_str().unwrap(), secrets_keys).unwrap_or_else(|error| panic!("[ERROR] {error:?}"));
 }
 
 /// Loads configuration values from configs.json and generates a configs.rs file
@@ -44,7 +42,7 @@ fn main() {
 /// # Arguments
 /// * `out_dir` - The target build directory path
 /// * `config_keys` - Array of configuration keys to extract from configs.json
-fn load_configs(out_dir: &str, config_keys: [&str; 1]) -> io::Result<()> {
+fn load_configs(out_dir: &str, config_keys: [&str; 2]) -> io::Result<()> {
     println!("[BUILD TASK] LOADING PROGRAM CONFIGURATIONS");
     println!("Configuration output directory: {out_dir:?}");
 
