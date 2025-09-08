@@ -29,8 +29,8 @@ fn main() {
 
     // Load configurations from local 'configs.json' file
     let configs_keys = [
-        "clock_system_freqeuency_mhz",
-        "clock_usb_freqeuency_mhz",
+        "clock_system_frequency_mhz",
+        "clock_usb_frequency_mhz",
         "clock_peripheral_divider",
         "clock_adc_frequency_mhz",
         "clock_reference_divider",

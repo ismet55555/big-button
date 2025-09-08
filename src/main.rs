@@ -38,8 +38,8 @@ async fn main(spawner: Spawner) {
     info!("Configuring all system clocks ...");
     let clock_settings = ClockSettings {
         xosc_crystal_hz: 12_000_000, // RP2350 uses 12MHz crystal
-        system_frequency_mhz: CLOCK_SYSTEM_FREQEUENCY_MHZ.parse::<u32>().unwrap(),
-        usb_frequency_mhz: CLOCK_USB_FREQEUENCY_MHZ.parse::<u32>().unwrap(),
+        system_frequency_mhz: CLOCK_SYSTEM_FREQUENCY_MHZ.parse::<u32>().unwrap(),
+        usb_frequency_mhz: CLOCK_USB_FREQUENCY_MHZ.parse::<u32>().unwrap(),
         peripheral_clock_divider: CLOCK_PERIPHERAL_DIVIDER.parse::<u8>().unwrap(),
         adc_frequency_mhz: CLOCK_ADC_FREQUENCY_MHZ.parse::<u32>().unwrap(),
         reference_clock_divider: CLOCK_REFERENCE_DIVIDER.parse::<u8>().unwrap(),
