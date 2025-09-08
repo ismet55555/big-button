@@ -1,4 +1,7 @@
 {
-  "system_clock_freqeuency_mhz": "133",
-  "usb_clock_freqeuency_mhz": "48"
+  "clock_system_freqeuency_mhz": "125",
+  "clock_usb_freqeuency_mhz": "48",
+  "clock_peripheral_divider": "1",
+  "clock_adc_frequency_mhz": "48",
+  "clock_reference_divider": "1"
 }

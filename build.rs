@@ -28,7 +28,13 @@ fn main() {
     println!("cargo:rerun-if-changed=secrets.json");
 
     // Load configurations from local 'configs.json' file
-    let configs_keys = ["system_clock_freqeuency_mhz", "usb_clock_freqeuency_mhz"];
+    let configs_keys = [
+        "clock_system_freqeuency_mhz",
+        "clock_usb_freqeuency_mhz",
+        "clock_peripheral_divider",
+        "clock_adc_frequency_mhz",
+        "clock_reference_divider",
+    ];
     load_configs(out_dir.to_str().unwrap(), configs_keys).unwrap_or_else(|error| panic!("[ERROR] {error:?}"));
 
     // Load secrets from local 'secrets.json' file with XOR obfuscation
@@ -42,7 +48,7 @@ fn main() {
 /// # Arguments
 /// * `out_dir` - The target build directory path
 /// * `config_keys` - Array of configuration keys to extract from configs.json
-fn load_configs(out_dir: &str, config_keys: [&str; 2]) -> io::Result<()> {
+fn load_configs(out_dir: &str, config_keys: [&str; 5]) -> io::Result<()> {
     println!("[BUILD TASK] LOADING PROGRAM CONFIGURATIONS");
     println!("Configuration output directory: {out_dir:?}");
 
@@ -66,6 +72,8 @@ fn load_configs(out_dir: &str, config_keys: [&str; 2]) -> io::Result<()> {
 
     println!("Parsing 'configs.json' as a JSON file ...");
     let config_values: serde_json::Value = serde_json::from_str(&contents_raw_string)?;
+
+    // Check all required keys
     for config_key in config_keys.iter() {
         if !config_values.as_object().unwrap().contains_key(*config_key) {
             let error_message = format!("Key '{}' not found in 'configs.json' file", config_key);
