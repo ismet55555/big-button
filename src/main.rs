@@ -13,8 +13,8 @@ use embassy_rp::gpio;
 use embassy_time::Timer;
 
 mod clocks_config;
-mod utility;
 use clocks_config::ClockSettings;
+mod utility;
 
 // Loading configurations
 // Note: This comes from the 'configs.rs' file created in 'build.rs' from 'configs.json'

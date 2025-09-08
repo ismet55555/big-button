@@ -72,8 +72,6 @@ fn load_configs(out_dir: &str, config_keys: [&str; 5]) -> io::Result<()> {
 
     println!("Parsing 'configs.json' as a JSON file ...");
     let config_values: serde_json::Value = serde_json::from_str(&contents_raw_string)?;
-
-    // Check all required keys
     for config_key in config_keys.iter() {
         if !config_values.as_object().unwrap().contains_key(*config_key) {
             let error_message = format!("Key '{}' not found in 'configs.json' file", config_key);
