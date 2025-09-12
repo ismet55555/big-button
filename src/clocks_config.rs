@@ -23,19 +23,29 @@ pub struct ClockSettings {
 /// Calculate the PLL (Phase-Locked Loop) configuration for the system clock and USB clock
 ///
 /// * `desired_freq_mhz` - Desired frequency in MHz
-/// * `xosc_freq_mhz` - Crystal oscillator frequency in Hz
+/// * `xosc_freq_hz` - Crystal oscillator frequency in Hz
 /// * `post_div1` - Post divider 1 value
 /// * `post_div2` - Post divider 2 value
 ///
 /// The formula for calculating the PLL configuration is:
 ///    `fbdiv = (desired_freq_mhz * post_div1 * post_div2) / xosc_freq_mhz`
 pub fn calculate_pll_config(desired_freq_mhz: u32, xosc_freq_hz: u32, post_div1: u8, post_div2: u8) -> PllConfig {
-    let refdiv = 1u8; // Constant as 1
-    let fbdiv = (desired_freq_mhz * post_div1 as u32 * post_div2 as u32) / (xosc_freq_hz / 1_000_000);
+    const HZ_PER_MHZ: u32 = 1_000_000;
+
+    let refdiv = 1u8; // Fixed reference divider
+    let xosc_freq_mhz = xosc_freq_hz / HZ_PER_MHZ;
+
+    // VCO target frequency in MHz (desired output * post dividers)
+    let vco_target_mhz = desired_freq_mhz * post_div1 as u32 * post_div2 as u32;
+
+    // Feedback divider: how many times to multiply the reference to hit the VCO target
+    let fbdiv = vco_target_mhz / xosc_freq_mhz;
+
     debug!(
         "PLL Config: {} MHz -> refdiv={}, fbdiv={}, post_div1={}, post_div2={}",
         desired_freq_mhz, refdiv, fbdiv, post_div1, post_div2
     );
+
     PllConfig {
         refdiv,
         fbdiv: fbdiv as u16,
