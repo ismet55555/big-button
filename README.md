@@ -15,7 +15,11 @@ Currently the following configurations are supported:
 
 ```json
 {
-  "number_of_messages": "5"
+  "clock_system_frequency_mhz": "133",
+  "clock_usb_frequency_mhz": "48",
+  "clock_peripheral_divider": "1",
+  "clock_adc_frequency_mhz": "48",
+  "clock_reference_divider": "1"
 }
 ```
 
