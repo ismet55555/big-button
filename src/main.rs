@@ -14,6 +14,7 @@ use embassy_time::Timer;
 
 mod clocks_config;
 use clocks_config::ClockSettings;
+mod state_machine;
 mod utility;
 
 // Loading configurations
@@ -50,6 +51,11 @@ async fn main(spawner: Spawner) {
     // Log and verify system clock frequencies
     clocks_config::print_device_frequencies();
     clocks_config::verify_clock_with_timer(500).await;
+
+    // Spawn state machine async task
+    spawner
+        .spawn(state_machine::state_machine_task())
+        .expect("Failed spawning state machine");
 
     info!("All Set! Running async loop ...");
 
