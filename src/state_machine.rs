@@ -7,10 +7,6 @@ use defmt::*;
 use defmt_rtt as _;
 use panic_probe as _;
 
-use embassy_executor::SpawnError;
-use embassy_executor::Spawner;
-use embassy_sync::blocking_mutex::raw::ThreadModeRawMutex; // Ensure thread-safety across tasks
-use embassy_sync::pubsub::{Publisher, Subscriber};
 use embassy_time::{Duration, Instant, Timer};
 
 /// State machine possible states
@@ -20,7 +16,7 @@ enum State {
     Startup,
     /// Device is idle
     Idle,
-    /// Device is processing something
+    /// Device is processing somethingpanic
     Processing,
     /// Device is in an error state
     Error,
@@ -39,19 +35,13 @@ enum Event {
     SomethingElse,
     /// Error has occurred
     Error,
-    /// Error recovery event
-    ErrorRecovery,
 }
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
 
 struct StateMachine {
     /// Current state of the state machine: [`State`]
     current_state: State,
     /// Latest event: [`Event`]
     latest_event: Event,
-    /// Last recovery attempt time
-    last_recovery_attempt: Instant,
 }
 
 impl StateMachine {
@@ -60,7 +50,6 @@ impl StateMachine {
         StateMachine {
             current_state,
             latest_event,
-            last_recovery_attempt: Instant::now(),
         }
     }
 
@@ -94,18 +83,8 @@ impl StateMachine {
                 self.current_state = State::Error;
             }
 
-            (State::Error, Event::ErrorRecovery) => {
-                info!("[State: Processing - Event: ErrorRecovery] Error Recovery: Error -> Idle");
-                if self.attempt_error_recovery().await {
-                    self.current_state = State::Idle;
-                    info!("Successfully recovered from error");
-                } else {
-                    self::panic!("Failed to recover from error");
-                }
-            }
-
             (State::Error, _) => {
-                // While state machine is in "Error" state, ignore all events except "ErrorRecovery"
+                core::panic!("[State: Error] State machine in an error state!");
             }
 
             _ => {} // No state change for unhandled events
@@ -115,19 +94,6 @@ impl StateMachine {
     /// Get the current event - based on various conditions and inputs
     /// Return event to the state machine for determining the next state
     async fn get_current_event(&mut self) -> Event {
-        // Check for any type of device Error
-        if self.check_for_errors().await {
-            return Event::Error;
-        }
-
-        // Error recovery if in Error state, periodically (every 10 sec) attempt recovery
-        if self.current_state == State::Error
-            && Instant::now().duration_since(self.last_recovery_attempt) >= Duration::from_secs(10)
-        {
-            self.last_recovery_attempt = Instant::now();
-            return Event::ErrorRecovery;
-        }
-
         // ++ Add event handling here (i.e. monitor button press) ++
 
         // No events occurred, return a nothing event
@@ -139,16 +105,7 @@ impl StateMachine {
     async fn check_for_errors(&self) -> bool {
         false
     }
-
-    /// Attempt to recover from an error condition
-    /// Return `true` if recovered from error
-    async fn attempt_error_recovery(&self) -> bool {
-        debug!("Attempting device error recovery ...");
-        false
-    }
 }
-
-//////////////////////////////////////////////////////////////////////////////////////////////////
 
 /// State machine task with infinite loop
 #[embassy_executor::task]
