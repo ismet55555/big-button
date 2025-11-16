@@ -7,7 +7,7 @@ use defmt::*;
 use defmt_rtt as _;
 use panic_probe as _;
 
-use embassy_time::{Duration, Instant, Timer};
+use embassy_time::Timer;
 
 /// State machine possible states
 #[derive(Format, Debug, Clone, Copy, PartialEq)]

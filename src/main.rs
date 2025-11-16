@@ -9,11 +9,12 @@ use panic_probe as _;
 
 use embassy_executor::Spawner;
 use embassy_rp::config::Config as HalConfig;
-use embassy_rp::gpio;
+use embassy_rp::gpio::{Input, Pull};
 use embassy_time::Timer;
 
 mod clocks_config;
 use clocks_config::ClockSettings;
+mod button;
 mod state_machine;
 mod utility;
 
@@ -51,6 +52,16 @@ async fn main(spawner: Spawner) {
     // Log and verify system clock frequencies
     clocks_config::print_device_frequencies();
     clocks_config::verify_clock_with_timer(500).await;
+
+    //////////////////////////////////////////////////////////////////////////
+
+    // Button - Define and spawn async task
+    let button_info = [(0_u8, Input::new(peripherals.PIN_15, Pull::Up))];
+    spawner
+        .spawn(button::start_button_monitor(button_info))
+        .expect("Failed spawning button_consumer");
+
+    //////////////////////////////////////////////////////////////////////////
 
     // Spawn state machine async task
     spawner
