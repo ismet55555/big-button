@@ -13,12 +13,13 @@ readme = "README.md"
 # Rust program dependencies
 # Reference: https://doc.rust-lang.org/cargo/guide/dependencies.html
 [dependencies]
-cortex-m = "0.7"    # Core support for ARM Cortex-M microcontrollers (M33 for RP2350)
-cortex-m-rt = "0.7" # Startup code and minimal runtime for Cortex-M
-defmt = "1.0"       # Deferred formatting for embedded logging
-defmt-rtt = "1.0"   # RTT (Real-Time Transfer) transport for defmt
-heapless = "0.9"    # Fixed-size collections for no_std environments
-panic-halt = "1.0"  # Basic panic handler that halts on panic
+assign-resources = { git = "https://github.com/adamgreig/assign-resources", rev = "bd22cb7a92031fb16f74a5da42469d466c33383e" } # TODO: Check this rev
+cortex-m = "0.7"                                                                                                               # Core support for ARM Cortex-M microcontrollers (M33 for RP2350)
+cortex-m-rt = "0.7"                                                                                                            # Startup code and minimal runtime for Cortex-M
+defmt = "1.0"                                                                                                                  # Deferred formatting for embedded logging
+defmt-rtt = "1.0"                                                                                                              # RTT (Real-Time Transfer) transport for defmt
+heapless = "0.9"                                                                                                               # Fixed-size collections for no_std environments
+panic-halt = "1.0"                                                                                                             # Basic panic handler that halts on panic
 
 # Debug probe panic handler with defmt support
 panic-probe = { version = "1.0", features = ["print-defmt"] }

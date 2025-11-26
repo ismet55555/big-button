@@ -116,16 +116,9 @@ impl<'a> Button<'a> {
             return;
         }
 
-        // let handle = self
-        //     .item_info
-        //     .iter_mut()
-        //     .find(|(item_id, _)| *item_id == id)
-        //     .map(|(_, handle)| handle);
-
         let mut button_down_press_timestamp: Instant;
         let mut button_up_release_timestamp: Instant;
 
-        // if let Some(_handle) = handle {
         loop {
             // Wait for button down press
             self.debounce_high_to_low(id).await;
@@ -157,7 +150,6 @@ impl<'a> Button<'a> {
                     press_type: PressType::RegularPress,
                 })
                 .await;
-            // }
         }
     }
 }

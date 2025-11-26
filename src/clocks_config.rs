@@ -137,8 +137,8 @@ pub async fn verify_clock_with_timer(milliseconds: u64) {
     let measured_diff = (measured_elapsed as i64 - expected_elapsed as i64).abs();
 
     // Use u64 to prevent overflow in calculation
-    let accuracy_percent_int = ((measured_diff as u64 * 100) / expected_elapsed as u64) as u32;
-    let accuracy_percent_frac = ((measured_diff as u64 * 10000) / expected_elapsed as u64 % 100) as u32;
+    let accuracy_percent_int = ((measured_diff as u64 * 100) / expected_elapsed) as u32;
+    let accuracy_percent_frac = ((measured_diff as u64 * 10000) / expected_elapsed % 100) as u32;
 
     debug!(
         "[System clock frequency test] Clock accuracy: {}.{:02}% off",

@@ -32,7 +32,7 @@ enum Event {
     /// Nothing has happened
     Nothing,
     // Temporary state machine event (To be replaced later)
-    SomethingElse,
+    SomethingElse, // TODO: Replace
     /// Error has occurred
     Error,
 }
