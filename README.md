@@ -15,6 +15,8 @@ Currently the following configurations are supported:
 
 ```json
 {
+  "button_long_hold_threshold": "2000",
+  "button_long_press_threshold": "300",
   "clock_system_frequency_mhz": "133",
   "clock_usb_frequency_mhz": "48",
   "clock_peripheral_divider": "1",
