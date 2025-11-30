@@ -9,8 +9,12 @@ use embassy_time::Instant;
 /// Button press type
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum PressType {
-    /// Regular button press type
-    RegularPress,
+    /// Short button press type
+    ShortRelease,
+    /// Long button press type
+    LongRelease,
+    /// Long hold
+    LongHold,
 }
 
 /// Button pub-sub message item definition/structure that is passed via channel
