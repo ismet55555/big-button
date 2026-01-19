@@ -12,6 +12,7 @@ use embassy_sync::pubsub::Subscriber;
 use embassy_time::Timer;
 
 use crate::button::{BUTTON_PUBSUB_CHANNEL, ButtonMessage, PressType};
+use crate::system_manager::SYSTEM_READY_PUBSUB_CHANNEL;
 
 /// State machine possible states
 #[derive(Format, Debug, Clone, Copy, PartialEq)]
@@ -151,6 +152,10 @@ pub async fn state_machine_task() -> ! {
 
     // Send a "PowerOn" event to state machine to handle
     state_machine.handle_event(Event::PowerOn).await;
+
+    // Waiting on system to be ready to proceed
+    let mut system_ready_message = SYSTEM_READY_PUBSUB_CHANNEL.subscriber().unwrap();
+    system_ready_message.next_message_pure().await;
 
     // Send a "Ready" event to state machine to handle
     state_machine.handle_event(Event::Ready).await;

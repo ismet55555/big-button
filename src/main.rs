@@ -16,6 +16,7 @@ mod clocks_config;
 use clocks_config::ClockSettings;
 mod button;
 mod state_machine;
+mod system_manager;
 mod utility;
 
 // Loading configurations
@@ -55,6 +56,11 @@ async fn main(spawner: Spawner) {
 
     //////////////////////////////////////////////////////////////////////////
 
+    // Task to check if all system components are ready to go
+    spawner.spawn(system_manager::wait_for_system_ready()).unwrap();
+
+    //////////////////////////////////////////////////////////////////////////
+
     // Button - Define and spawn async task
     let button_info = [(0_u8, Input::new(peripherals.PIN_15, Pull::Up))];
     spawner
@@ -68,7 +74,7 @@ async fn main(spawner: Spawner) {
         .spawn(state_machine::state_machine_task())
         .expect("Failed spawning state machine");
 
-    info!("All Set! Running async loop ...");
+    info!("Running async loop ...");
 
     // General async loop to ensure entire program runs forever while
     // asynchronously working on other tasks
