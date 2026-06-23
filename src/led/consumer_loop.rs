@@ -8,8 +8,10 @@ use embassy_rp::gpio::Output;
 
 use embassy_futures::select::{Either, select};
 
-use super::utility::do_nothing_idle;
+use super::LED_READY_SIGNAL;
+use super::utility;
 use super::{LED_PUBSUB_CHANNEL, Led, LedMessage};
+use crate::system_manager::SYSTEM_READY_PUBSUB_CHANNEL;
 
 /// Async task - LED consumer
 /// Continuously monitor LED status changes messages
@@ -25,13 +27,20 @@ pub async fn start_led_consumer(led_info: [(u8, Output<'static>); 8]) -> ! {
     // Set all LEDs to OFF
     led.set_status(&[], false).await;
 
+    // Signal to system that button is ready to be used
+    LED_READY_SIGNAL.signal(true);
+
+    // Wait idle until the system manager sends a ready signal
+    let mut system_ready_message = SYSTEM_READY_PUBSUB_CHANNEL.subscriber().unwrap();
+    select(system_ready_message.next_message_pure(), utility::do_nothing_idle()).await;
+
     loop {
         debug!("LED simple consumer is waiting for its pubsub message ...");
 
         // Select between an available message OR idle behavior
         let led_message_or_idle = select(
             led_pubsub_topic_subscriber.next_message_pure(), // Get topic message from channel
-            do_nothing_idle(),
+            utility::do_nothing_idle(),
         )
         .await;
 

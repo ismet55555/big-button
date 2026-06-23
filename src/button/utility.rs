@@ -1,4 +1,4 @@
-//! LED - Utility functions
+//! Button - Utility functions
 
 use embassy_time::Timer;
 

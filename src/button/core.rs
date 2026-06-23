@@ -4,13 +4,15 @@ use defmt::*;
 use defmt_rtt as _;
 use panic_probe as _;
 
+use embassy_futures::select::{Either, select};
 use embassy_rp::gpio::Input;
 use embassy_sync::blocking_mutex::raw::ThreadModeRawMutex; // Ensure thread-safety across tasks
 use embassy_sync::pubsub::{Error, Publisher};
-use embassy_time::Instant;
 use embassy_time::Timer;
+use embassy_time::{Duration, Instant};
 
 use super::{BUTTON_PUBSUB_CHANNEL, ButtonMessage, PressType};
+use crate::{BUTTON_LONG_HOLD_THRESHOLD, BUTTON_LONG_PRESS_THRESHOLD};
 
 // Custom type aliases
 type ItemId = u8;
@@ -108,6 +110,11 @@ impl<'a> Button<'a> {
     }
 
     /// Continuously watch specified button edge state and report button press.
+    /// Button press patterns can be the following:
+    ///
+    ///   - Short Press - Released before long press threshold
+    ///   - Long Press - Released after long press threshold
+    ///   - Long Hold - Held more than long hold threshold
     ///
     /// * `id` - Button ID number
     pub async fn monitor_press(&mut self, id: u8) -> () {
@@ -115,6 +122,11 @@ impl<'a> Button<'a> {
             error!("Failed to find specified Button ID in the pre-defined Button info");
             return;
         }
+
+        let button_long_press_release_threshold =
+            Duration::from_millis(BUTTON_LONG_PRESS_THRESHOLD.parse::<u64>().unwrap());
+        let button_long_press_hold_threshold =
+            Duration::from_millis(BUTTON_LONG_HOLD_THRESHOLD.parse::<u64>().unwrap());
 
         let mut button_down_press_timestamp: Instant;
         let mut button_up_release_timestamp: Instant;
@@ -124,32 +136,77 @@ impl<'a> Button<'a> {
             self.debounce_high_to_low(id).await;
 
             button_down_press_timestamp = Instant::now();
-            info!(
+            debug!(
                 "Button ID {} down pressed! - Timestamp: {:?}ms",
                 id,
                 button_down_press_timestamp.as_millis()
             );
 
-            // Wait for button up release
-            self.debounce_low_to_high(id).await;
-            button_up_release_timestamp = Instant::now();
-            let release_time = button_up_release_timestamp.duration_since(button_down_press_timestamp);
-            info!(
-                "Button ID {} up released! - Timestamp: {:?}ms -> Time Difference: {:?}ms",
-                id,
-                button_up_release_timestamp.as_millis(),
-                release_time.as_millis(),
-            );
+            // Long press hold timer
+            let long_press_hold_future = Timer::after(button_long_press_hold_threshold);
 
-            // Publish the button press event message to channel
-            self.button_pubsub_publisher
-                .publish(ButtonMessage {
-                    id,
-                    timestamp_start: button_down_press_timestamp,
-                    timestamp_end: button_up_release_timestamp,
-                    press_type: PressType::RegularPress,
-                })
-                .await;
+            // Wait for either button release OR long press timeout
+            match select(self.debounce_low_to_high(id), long_press_hold_future).await {
+                Either::First(_) => {
+                    // Button released before long hold timeout
+                    button_up_release_timestamp = Instant::now();
+                    let release_time = button_up_release_timestamp.duration_since(button_down_press_timestamp);
+                    debug!(
+                        "Button ID {} up released! - Timestamp: {:?}ms -> Time Difference: {:?}ms",
+                        id,
+                        button_up_release_timestamp.as_millis(),
+                        release_time.as_millis(),
+                    );
+
+                    if release_time < button_long_press_release_threshold {
+                        // PRESS: SHORT PRESS - released before long timeout
+                        debug!(
+                            "Button ID {} - Press type: SHORT RELEASE (< {}ms)",
+                            id,
+                            button_long_press_release_threshold.as_millis()
+                        );
+                        self.button_pubsub_publisher
+                            .publish(ButtonMessage {
+                                id,
+                                timestamp_start: button_down_press_timestamp,
+                                timestamp_end: button_up_release_timestamp,
+                                press_type: PressType::ShortRelease,
+                            })
+                            .await;
+                    } else {
+                        // PRESS: LONG PRESS - released after long press threshold
+                        debug!(
+                            "Button ID {} - Press type: LONG RELEASE (>= {}ms)",
+                            id,
+                            button_long_press_release_threshold.as_millis()
+                        );
+                        self.button_pubsub_publisher
+                            .publish(ButtonMessage {
+                                id,
+                                timestamp_start: button_down_press_timestamp,
+                                timestamp_end: button_up_release_timestamp,
+                                press_type: PressType::LongRelease,
+                            })
+                            .await;
+                    }
+                }
+                Either::Second(_) => {
+                    // PRESS: LONG HOLD - no release detected before long hold threshold
+                    debug!(
+                        "Button ID {} - Press type: LONG HOLD (>= {}ms)",
+                        id,
+                        button_long_press_hold_threshold.as_millis()
+                    );
+                    self.button_pubsub_publisher
+                        .publish(ButtonMessage {
+                            id,
+                            timestamp_start: button_down_press_timestamp,
+                            timestamp_end: Instant::now(),
+                            press_type: PressType::LongHold,
+                        })
+                        .await;
+                }
+            }
         }
     }
 }

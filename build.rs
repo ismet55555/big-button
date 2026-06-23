@@ -29,6 +29,8 @@ fn main() {
 
     // Load configurations from local 'configs.json' file
     let configs_keys = [
+        "button_long_hold_threshold",
+        "button_long_press_threshold",
         "clock_system_frequency_mhz",
         "clock_usb_frequency_mhz",
         "clock_peripheral_divider",
@@ -48,7 +50,7 @@ fn main() {
 /// # Arguments
 /// * `out_dir` - The target build directory path
 /// * `config_keys` - Array of configuration keys to extract from configs.json
-fn load_configs(out_dir: &str, config_keys: [&str; 5]) -> io::Result<()> {
+fn load_configs(out_dir: &str, config_keys: [&str; 7]) -> io::Result<()> {
     println!("[BUILD TASK] LOADING PROGRAM CONFIGURATIONS");
     println!("Configuration output directory: {out_dir:?}");
 

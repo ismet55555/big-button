@@ -11,4 +11,4 @@ mod utility;
 // Public re-export of specifics that are available outside
 pub use consumer_loop::start_led_consumer;
 pub use core::Led;
-pub use messaging::{LED_PUBSUB_CHANNEL, LedMessage};
+pub use messaging::{LED_PUBSUB_CHANNEL, LED_READY_SIGNAL, LedMessage};
